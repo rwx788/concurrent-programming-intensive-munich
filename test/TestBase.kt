@@ -19,14 +19,13 @@ abstract class TestBase(
     fun modelCheckingTest() = try {
         ModelCheckingOptions()
             .iterations(scenarios)
-            .invocationsPerIteration(5_000)
+            .invocationsPerIteration(10_000)
             .actorsBefore(1)
             .threads(3)
             .actorsPerThread(2)
             .actorsAfter(0)
             .checkObstructionFreedom(checkObstructionFreedom)
             .sequentialSpecification(sequentialSpecification.java)
-            .logLevel(LoggingLevel.INFO)
             .apply { customConfiguration() }
             .check(this::class.java)
     } catch (t: Throwable) {
@@ -38,13 +37,12 @@ abstract class TestBase(
     fun stressTest() = try {
         StressOptions()
             .iterations(scenarios)
-            .invocationsPerIteration(5_000)
+            .invocationsPerIteration(25_000)
             .actorsBefore(1)
             .threads(3)
             .actorsPerThread(2)
             .actorsAfter(0)
             .sequentialSpecification(sequentialSpecification.java)
-            .logLevel(LoggingLevel.INFO)
             .apply { customConfiguration() }
             .check(this::class.java)
     } catch (t: Throwable) {

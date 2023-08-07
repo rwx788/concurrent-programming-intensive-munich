@@ -23,7 +23,10 @@ class MSQueue<E> : Queue<E> {
     // FOR TEST PURPOSE, DO NOT CHANGE IT.
     override fun validate() {
         check(tail.get().next.get() == null) {
-            "`tail.next` must be `null`"
+            "At the end of the execution, `tail.next` must be `null`"
+        }
+        check(head.get().element == null) {
+            "At the end of the execution, the dummy node shouldn't store an element"
         }
     }
 
