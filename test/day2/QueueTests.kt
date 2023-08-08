@@ -15,8 +15,13 @@ class MSQueueWithConstantTimeRemoveTest : AbstractQueueWithRemoveTest(MSQueueWit
 
 abstract class AbstractQueueWithRemoveTest(
     private val queue: QueueWithRemove<Int>,
-    checkObstructionFreedom: Boolean = true
-) : AbstractQueueTest(queue, checkObstructionFreedom) {
+    checkObstructionFreedom: Boolean = true,
+) : AbstractQueueTest(
+    queue = queue,
+    checkObstructionFreedom = checkObstructionFreedom,
+    threads = 3,
+    actorsBefore = 4
+) {
     @Operation
     fun remove(@Param(name = "element") element: Int) = queue.remove(element)
 }
@@ -24,7 +29,9 @@ abstract class AbstractQueueWithRemoveTest(
 @Param(name = "element", gen = IntGen::class, conf = "0:3")
 class MSQueueWithLinearTimeNonParallelRemoveTest: TestBase(
     sequentialSpecification = IntQueueSequential::class,
-    checkObstructionFreedom = true
+    checkObstructionFreedom = true,
+    threads = 2,
+    actorsBefore = 5
 ) {
     private val queue = MSQueueWithLinearTimeNonParallelRemove<Int>()
 

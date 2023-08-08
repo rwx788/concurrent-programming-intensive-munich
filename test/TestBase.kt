@@ -13,15 +13,17 @@ import kotlin.reflect.*
 abstract class TestBase(
     val sequentialSpecification: KClass<*>,
     val checkObstructionFreedom: Boolean = true,
-    val scenarios: Int = 150
+    val scenarios: Int = 150,
+    val threads: Int = 3,
+    val actorsBefore: Int = 1
 ) {
     @Test
     fun modelCheckingTest() = try {
         ModelCheckingOptions()
             .iterations(scenarios)
             .invocationsPerIteration(10_000)
-            .actorsBefore(1)
-            .threads(3)
+            .actorsBefore(actorsBefore)
+            .threads(threads)
             .actorsPerThread(2)
             .actorsAfter(0)
             .checkObstructionFreedom(checkObstructionFreedom)
@@ -38,8 +40,8 @@ abstract class TestBase(
         StressOptions()
             .iterations(scenarios)
             .invocationsPerIteration(25_000)
-            .actorsBefore(1)
-            .threads(3)
+            .actorsBefore(actorsBefore)
+            .threads(threads)
             .actorsPerThread(2)
             .actorsAfter(0)
             .sequentialSpecification(sequentialSpecification.java)
