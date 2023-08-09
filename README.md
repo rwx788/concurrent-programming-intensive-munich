@@ -161,18 +161,6 @@ To test your solution, please run:
 * `./gradlew test --tests AtomicArrayWithCAS2SingleWriterTest` on Linux or MacOS
 * `gradlew test --tests AtomicArrayWithCAS2SingleWriterTest` on Windows
 
-### Single-Writer CAS2 with Parallel Reads and CAS
-
-In [`src/day3/AtomicArrayWithSingleWriterCas2AndCasSimplified.kt`](src/day3/AtomicArrayWithSingleWriterCas2AndCasSimplified.kt),
-implement the `cas2(..)`, `get(..)`, and `cas(..)` operations.
-In this data task, `CAS2(..)` can be called only in one thread,
-but `cas(..)` can be called concurrently and should help `CAS2` to finish.
-
-To test your solution, please run:
-
-* `./gradlew test --tests AtomicArrayWithSingleWriterCas2AndCasSimplifiedTest` on Linux or MacOS
-* `gradlew test --tests AtomicArrayWithSingleWriterCas2AndCasSimplifiedTest` on Windows
-
 ### CAS2: Simplified
 
 In [`src/day3/AtomicArrayWithCAS2Simplified.kt`](src/day3/AtomicArrayWithCAS2Simplified.kt),
@@ -184,6 +172,19 @@ To test your solution, please run:
 * `./gradlew test --tests AtomicArrayWithCAS2SimplifiedTest` on Linux or MacOS
 * `gradlew test --tests AtomicArrayWithCAS2SimplifiedTest` on Windows
 
+### CAS2: With Implemented DCSS
+
+In [`src/day3/AtomicArrayWithCAS2.kt`](src/day3/AtomicArrayWithCAS2.kt),
+implement the `cas2(..)` operation.
+Unlike in the "CAS2: Simplified" task, updates are no longer unique.
+This can lead to the ABA problem. To solve it, please use
+the already implemented Double-Compare-Single-Set operation when installing CAS2 descriptors.
+
+To test your solution, please run:
+
+* `./gradlew test --tests AtomicArrayWithCAS2Test` on Linux or MacOS
+* `gradlew test --tests AtomicArrayWithCAS2Test` on Windows
+
 
 ### CAS2
 
@@ -192,6 +193,7 @@ implement the `cas2(..)` operation.
 Unlike in the "CAS2: Simplified" task, updates are no longer unique.
 This can lead to the ABA problem. To solve it, please use
 the Double-Compare-Single-Set operation when installing CAS2 descriptors.
+In this task, you need to implement DCSS via descriptors.
 
 To test your solution, please run:
 

@@ -20,11 +20,6 @@ class AtomicArrayWithCAS2<E : Any>(size: Int, initialValue: E) {
         return array[index] as E?
     }
 
-    fun cas(index: Int, expected: E?, update: E?): Boolean {
-        // TODO: the cell can store a descriptor
-        return array.compareAndSet(index, expected, update)
-    }
-
     fun cas2(
         index1: Int, expected1: E?, update1: E?,
         index2: Int, expected2: E?, update2: E?
