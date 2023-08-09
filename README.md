@@ -161,6 +161,18 @@ To test your solution, please run:
 * `./gradlew test --tests AtomicArrayWithCAS2SingleWriterTest` on Linux or MacOS
 * `gradlew test --tests AtomicArrayWithCAS2SingleWriterTest` on Windows
 
+### Single-Writer CAS2 with Parallel Reads and CAS
+
+In [`src/day3/AtomicArrayWithSingleWriterCas2AndCasSimplified.kt`](src/day3/AtomicArrayWithSingleWriterCas2AndCasSimplified.kt),
+implement the `cas2(..)`, `get(..)`, and `cas(..)` operations.
+In this data task, `CAS2(..)` can be called only in one thread,
+but `cas(..)` can be called concurrently and should help `CAS2` to finish.
+
+To test your solution, please run:
+
+* `./gradlew test --tests AtomicArrayWithSingleWriterCas2AndCasSimplifiedTest` on Linux or MacOS
+* `gradlew test --tests AtomicArrayWithSingleWriterCas2AndCasSimplifiedTest` on Windows
+
 ### CAS2: Simplified
 
 In [`src/day3/AtomicArrayWithCAS2Simplified.kt`](src/day3/AtomicArrayWithCAS2Simplified.kt),
