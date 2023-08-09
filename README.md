@@ -182,8 +182,8 @@ the already implemented Double-Compare-Single-Set operation when installing CAS2
 
 To test your solution, please run:
 
-* `./gradlew test --tests AtomicArrayWithCAS2Test` on Linux or MacOS
-* `gradlew test --tests AtomicArrayWithCAS2Test` on Windows
+* `./gradlew test --tests AtomicArrayWithCAS2AndImplementedDCSSTest` on Linux or MacOS
+* `gradlew test --tests AtomicArrayWithCAS2AndImplementedDCSSTest` on Windows
 
 
 ### CAS2
