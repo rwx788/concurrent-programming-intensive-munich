@@ -9,7 +9,7 @@ import org.jetbrains.kotlinx.lincheck.paramgen.*
 @Param(name = "value", gen = IntGen::class, conf = "0:2")
 class AtomicArrayWithCAS2Test : TestBase(
     sequentialSpecification = IntAtomicArraySequential::class,
-    scenarios = 300
+    scenarios = 1000
 ) {
     private val array = AtomicArrayWithCAS2(ARRAY_SIZE, 0)
 
@@ -30,7 +30,7 @@ class AtomicArrayWithCAS2Test : TestBase(
 @Param(name = "value", gen = IntGen::class, conf = "0:2")
 class AtomicArrayWithCAS2SingleWriterTest : TestBase(
     sequentialSpecification = IntAtomicArraySequential::class,
-    scenarios = 300
+    scenarios = 1000
 ) {
     private val array = AtomicArrayWithCAS2SingleWriter(ARRAY_SIZE, 0)
 
