@@ -1,6 +1,7 @@
 package day2
 
-import java.util.concurrent.atomic.*
+import java.util.concurrent.atomic.AtomicBoolean
+import java.util.concurrent.atomic.AtomicReference
 
 class MSQueueWithOnlyLogicalRemove<E> : QueueWithRemove<E> {
     private val head: AtomicReference<Node<E>>
@@ -14,7 +15,16 @@ class MSQueueWithOnlyLogicalRemove<E> : QueueWithRemove<E> {
 
     override fun enqueue(element: E) {
         // TODO: Copy your implementation.
-        TODO("Implement me!")
+        val node = Node(element)
+        while (true) {
+            val currentTail = tail.get()
+            if (currentTail.next.compareAndSet(null, node)) {
+                tail.compareAndSet(currentTail, node)
+                return
+            } else {
+                tail.compareAndSet(currentTail, currentTail.next.get())
+            }
+        }
     }
 
     override fun dequeue(): E? {
@@ -24,7 +34,23 @@ class MSQueueWithOnlyLogicalRemove<E> : QueueWithRemove<E> {
         // TODO: mark the node that contains the extracting
         // TODO: element as "extracted or removed", restarting
         // TODO: the operation if this node has already been removed.
-        TODO("Implement me!")
+        while (true) {
+            val curHead = head.get()
+            val curTail = tail.get()
+            val newHead = curHead.next.get()
+            // If null - queue is empty
+            if (curHead == curTail) {
+                if (newHead == null)
+                    return null
+                else
+                    tail.compareAndSet(curTail, curTail.next.get())
+            } else if (newHead != null) {
+                if (head.compareAndSet(curHead, newHead)) {
+                    if(newHead.markExtractedOrRemoved())
+                        return newHead.element
+                }
+            }
+        }
     }
 
     override fun remove(element: E): Boolean {
@@ -81,7 +107,7 @@ class MSQueueWithOnlyLogicalRemove<E> : QueueWithRemove<E> {
             // TODO: operation should return `true`.
             // TODO: Otherwise, the node is already either extracted or removed,
             // TODO: so the operation should return `false`.
-            TODO("Implement me!")
+            return markExtractedOrRemoved()
         }
     }
 }
