@@ -7,7 +7,10 @@ import org.jetbrains.kotlinx.lincheck.paramgen.*
 
 @Param(name = "index", gen = IntGen::class, conf = "0:${ARRAY_SIZE - 1}")
 @Param(name = "value", gen = IntGen::class, conf = "0:2")
-class AtomicArrayWithCAS2Test : TestBase(IntAtomicArraySequential::class) {
+class AtomicArrayWithCAS2Test : TestBase(
+    sequentialSpecification = IntAtomicArraySequential::class,
+    scenarios = 300
+) {
     private val array = AtomicArrayWithCAS2(ARRAY_SIZE, 0)
 
     @Operation(params = ["index"])
@@ -25,7 +28,10 @@ class AtomicArrayWithCAS2Test : TestBase(IntAtomicArraySequential::class) {
 
 @Param(name = "index", gen = IntGen::class, conf = "0:${ARRAY_SIZE - 1}")
 @Param(name = "value", gen = IntGen::class, conf = "0:2")
-class AtomicArrayWithCAS2SingleWriterTest : TestBase(IntAtomicArraySequential::class) {
+class AtomicArrayWithCAS2SingleWriterTest : TestBase(
+    sequentialSpecification = IntAtomicArraySequential::class,
+    scenarios = 300
+) {
     private val array = AtomicArrayWithCAS2SingleWriter(ARRAY_SIZE, 0)
 
     @Operation(params = ["index"])
@@ -41,7 +47,7 @@ class AtomicArrayWithCAS2SingleWriterTest : TestBase(IntAtomicArraySequential::c
 }
 
 class AtomicArrayWithCAS2SimplifiedTest : TestBase(
-    IntAtomicArraySequential::class,
+    sequentialSpecification = IntAtomicArraySequential::class,
     scenarios = 0
 ) {
     private val array = AtomicArrayWithCAS2Simplified(ARRAY_SIZE, 0)
