@@ -3,7 +3,8 @@
 package day3
 
 import day3.AtomicArrayWithCAS2SingleWriter.Status.*
-import java.util.concurrent.atomic.*
+import java.util.concurrent.atomic.AtomicReference
+import java.util.concurrent.atomic.AtomicReferenceArray
 
 // This implementation never stores `null` values.
 class AtomicArrayWithCAS2SingleWriter<E : Any>(size: Int, initialValue: E) {
@@ -18,7 +19,30 @@ class AtomicArrayWithCAS2SingleWriter<E : Any>(size: Int, initialValue: E) {
 
     fun get(index: Int): E {
         // TODO: the cell can store CAS2Descriptor
-        return array[index] as E
+        val state = array[index]
+        if (state is AtomicArrayWithCAS2SingleWriter<*>.CAS2Descriptor) {
+            if (state.status.get() != SUCCESS) {
+                if (index == state.index1) {
+                    //array.compareAndSet(index, state, state.expected1)
+                    return state.expected1 as E
+                }
+                if (index == state.index2) {
+                    //array.compareAndSet(index, state, state.expected2)
+                    return state.expected2 as E
+                }
+            } else {
+                if (index == state.index1) {
+                    //array.compareAndSet(index, state, state.update1)
+                    return state.update1 as E
+                }
+                if (index == state.index2) {
+                    //array.compareAndSet(index, state, state.update2)
+                    return state.update2 as E
+                }
+            }
+        }
+
+        return state as E
     }
 
     fun cas2(
@@ -45,6 +69,36 @@ class AtomicArrayWithCAS2SingleWriter<E : Any>(size: Int, initialValue: E) {
             // TODO: create functions for each of these three phases.
             // TODO: In this task, only one thread can call cas2(..),
             // TODO: so cas2(..) calls cannot be executed concurrently.
+            installDescriptor()
+            if (status.get() == SUCCESS) {
+                if (array.compareAndSet(index1, this, update1)) {
+                    if (array.compareAndSet(index2, this, update2)) {
+
+                    }
+
+                }
+
+            } else if (status.get() == FAILED) {
+                if (array.compareAndSet(index1, this, expected1)) {
+                    if (array.compareAndSet(index2, this, expected2)) {
+
+                    }
+
+                }
+            }
+        }
+
+        private fun installDescriptor() {
+            if (array.compareAndSet(index1, expected1, this)) {
+                if (array.compareAndSet(index2, expected2, this)) {
+                    status.compareAndSet(UNDECIDED, SUCCESS)
+                } else {
+                    //array.compareAndSet(index1, this, expected1)
+                    status.compareAndSet(UNDECIDED, FAILED)
+                }
+            } else {
+                status.compareAndSet(UNDECIDED, FAILED)
+            }
         }
     }
 
