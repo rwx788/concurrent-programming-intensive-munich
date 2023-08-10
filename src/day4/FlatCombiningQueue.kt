@@ -1,8 +1,9 @@
 package day4
 
-import day1.*
-import java.util.concurrent.*
-import java.util.concurrent.atomic.*
+import day1.Queue
+import java.util.concurrent.ThreadLocalRandom
+import java.util.concurrent.atomic.AtomicBoolean
+import java.util.concurrent.atomic.AtomicReferenceArray
 
 class FlatCombiningQueue<E> : Queue<E> {
     private val queue = ArrayDeque<E>() // sequential queue
@@ -21,8 +22,43 @@ class FlatCombiningQueue<E> : Queue<E> {
         // TODO:      `null` with the element. Wait until either the cell state
         // TODO:      updates to `Result` (do not forget to clean it in this case),
         // TODO:      or `combinerLock` becomes available to acquire.
-        queue.addLast(element)
+        while (true) {
+            if (tryLock()) {
+                processLockEnqueue(element)
+                return
+            }
+            var cellIndex = randomCellIndex()
+            if (tasksForCombiner.compareAndSet(cellIndex, null, element)) {
+                while (true) {
+                    var cellValue = tasksForCombiner.get(cellIndex)
+                    when {
+                        cellValue is Result<*> -> {
+                            tasksForCombiner.compareAndSet(cellIndex, cellValue, null)
+                            return
+                        }
+
+                        tryLock() -> {
+                            cellValue = tasksForCombiner.get(cellIndex)
+                            tasksForCombiner.compareAndSet(cellIndex, cellValue, null)
+                            if (cellValue is Result<*>) {
+                                unlock()
+                                return
+                            }
+                            processLockEnqueue(element)
+                            return
+                        }
+                    }
+                }
+            }
+        }
     }
+
+    private fun processLockEnqueue(element: E) {
+        queue.addLast(element)
+        helpArray()
+        unlock()
+    }
+
 
     override fun dequeue(): E? {
         // TODO: Make this code thread-safe using the flat-combining technique.
@@ -36,11 +72,70 @@ class FlatCombiningQueue<E> : Queue<E> {
         // TODO:      `null` with `Dequeue`. Wait until either the cell state
         // TODO:      updates to `Result` (do not forget to clean it in this case),
         // TODO:      or `combinerLock` becomes available to acquire.
-        return queue.removeFirstOrNull()
+        while (true) {
+            if (tryLock()) {
+                return processLockDequeue()
+            }
+            var cellIndex = randomCellIndex()
+            if (tasksForCombiner.compareAndSet(cellIndex, null, Dequeue)) {
+                while (true) {
+                    var cellValue = tasksForCombiner.get(cellIndex)
+                    when {
+                        cellValue is Result<*> -> {
+                            tasksForCombiner.compareAndSet(cellIndex, cellValue, null)
+                            return cellValue.value as E
+                        }
+
+                        tryLock() -> {
+                            cellValue = tasksForCombiner.get(cellIndex)
+                            tasksForCombiner.compareAndSet(cellIndex, cellValue, null)
+                            if (cellValue is Result<*>) {
+                                unlock()
+                                return cellValue.value as E
+                            }
+                            return processLockDequeue()
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    private fun processLockDequeue(): E? {
+        val result = queue.removeFirstOrNull()
+        helpArray()
+        unlock()
+        return result
+    }
+
+    private fun tryLock(): Boolean {
+        return combinerLock.compareAndSet(false, true)
+    }
+
+    private fun unlock() {
+        combinerLock.set(false)
     }
 
     private fun randomCellIndex(): Int =
         ThreadLocalRandom.current().nextInt(tasksForCombiner.length())
+
+    private fun helpArray() {
+        for (index in 0 until tasksForCombiner.length()) {
+            when (val cell = tasksForCombiner.get(index)) {
+                // dequeue
+                is Dequeue -> tasksForCombiner.compareAndSet(index, Dequeue, Result(queue.removeFirstOrNull()))
+                // already processed, leave for another thread to pick
+                is Result<*> -> {}
+                null -> {}
+                // enqueue request, put result to the queue
+                else -> {
+                    if (tasksForCombiner.compareAndSet(index, cell, Result(cell))) {
+                        queue.addLast(cell as E)
+                    }
+                }
+            }
+        }
+    }
 }
 
 private const val TASKS_FOR_COMBINER_SIZE = 3 // Do not change this constant!
