@@ -26,6 +26,7 @@ abstract class TestBase(
             .threads(threads)
             .actorsPerThread(2)
             .actorsAfter(0)
+            .logLevel(LoggingLevel.INFO)
             .checkObstructionFreedom(checkObstructionFreedom)
             .sequentialSpecification(sequentialSpecification.java)
             .apply { customConfiguration() }
@@ -45,6 +46,7 @@ abstract class TestBase(
             .actorsPerThread(2)
             .actorsAfter(0)
             .sequentialSpecification(sequentialSpecification.java)
+            .logLevel(LoggingLevel.INFO)
             .apply { customConfiguration() }
             .check(this::class.java)
     } catch (t: Throwable) {
